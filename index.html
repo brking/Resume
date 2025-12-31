@@ -7,9 +7,60 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat&family=Open+Sans&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/styles.css">
   </head>
   <body class="home">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="resume.html">Resume</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link collapsed" data-bs-toggle="collapse" href="#interestsCollapse" role="button" aria-expanded="false" aria-controls="interestsCollapse">
+            Interests
+          </a>
+          <div class="collapse" id="interestsCollapse">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link indent-1 collapsed" data-bs-toggle="collapse" href="#aiAppsCollapse" role="button" aria-expanded="false" aria-controls="aiAppsCollapse">
+                  AI Apps
+                </a>
+                <div class="collapse" id="aiAppsCollapse">
+                  <ul class="nav flex-column">
+                    <li class="nav-item">
+                      <a class="nav-link indent-2" href="apps/screen-recorder.html">Screen Recorder</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link indent-2" href="apps/stumble-discovery.html">Stumble Upon</a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link indent-1" href="astronomy/astronomy.html">Astronomy</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link indent-1" href="#music">Music</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link indent-1" href="#art">Art</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="mailto:bradley.kisia@gmail.com">Contact</a>
+        </li>
+      </ul>
+    </nav>
+
     <!-- //  INTRO  // -->
     <div class="content-wrapper">
       <div class="content-bg">
@@ -25,27 +76,25 @@
         <main>
           <p>Data Analytics Consultant with deep experience delivering reliable reporting, dashboards, and data solutions across financial services, telecommunications, utilities, and education. Strong background in SQL-based data modeling, Power BI and SSRS reporting, and end-to-end ETL processes. Known for diagnosing complex data issues, ensuring data quality, and translating business needs into practical, decision-ready insights. Comfortable partnering with business leaders, technology teams, and operations to improve performance and service outcomes.</p>
 
-          <p>To learn more about my work history, check out my <a href="resume.html" target="_blank" rel="noopener noreferrer"> Resume</a>. Thanks for stopping by!</p>
-		  </br>
-          <h3>Interesting AI Generated Apps (<a href="https://claude.ai/">Claude</a>)</h3>
-		  <ul>
-			<li><a href="apps/screen-recorder.html" target="_blank" rel="noopener noreferrer">Screen Recorder</a></li>
-			<li><a href="apps/stumble-discovery.html" target="_blank" rel="noopener noreferrer">Stumble Upon</a></li>
-		  </ul>
+          <p>To learn more about my work history, check out my <a href="resume.html" target="_blank" rel="noopener noreferrer">Resume</a>. Thanks for stopping by!</p>
         </main>
       </div>
     </div>
+    
     <!-- //  FOOTER INFO, SOCIAL MEDIA  // -->
     <footer>
-		<div>
-		  <p>© 2025 by Bradley Kisia |  <a href="mailto:bradley.kisia@gmail.com">bradley.kisia@gmail.com</a></p>
-		  <p style="font-size: 10px; color: #666; margin-top: 5px; font-style: italic;">This is based on Christina Truong's CSS Essential Training web page on LinkedIn Learning</p>
-		 </div>
+      <div>
+        <p>© 2025 by Bradley Kisia | <a href="mailto:bradley.kisia@gmail.com">bradley.kisia@gmail.com</a></p>
+        <p style="font-size: 10px; color: #666; margin-top: 5px; font-style: italic;">This is based on Christina Truong's CSS Essential Training web page on LinkedIn Learning</p>
+      </div>
       <ul class="socials">
         <li>
           <a href="https://www.linkedin.com/in/bkisia" target="_blank"><img src="images/icon-logo-linkedin.png" alt="My LinkedIn profile"></a>
         </li>
       </ul>
     </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
