@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stumble Discovery - Discover Amazing Websites</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.3em;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .categories {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .categories::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .categories::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .categories::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        .categories::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .category-btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #f3f4f6;
+            color: #333;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-btn:hover {
+            background: #e5e7eb;
+            transform: translateX(4px);
+        }
+
+        .category-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            background: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .sparkle {
+            font-size: 1.5em;
+            display: inline-block;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stumble-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 32px;
+            font-size: 1em;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .stumble-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .stumble-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .like-btn {
+            background: #10b981;
+            color: white;
+        }
+
+        .like-btn:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .dislike-btn {
+            background: #e5e7eb;
+            color: #333;
+        }
+
+        .dislike-btn:hover {
+            background: #d1d5db;
+            transform: translateY(-2px);
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            height: fit-content;
+        }
+
+        .preview-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+        }
+
+        .preview-title {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .preview-frame {
+            flex: 1;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            background: #f9fafb;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .preview-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #9ca3af;
+            font-size: 0.9em;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .site-display {
+            text-align: center;
+            padding: 40px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .site-display.fade {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        .site-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+        }
+
+        .site-name {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .site-description {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .visit-btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1.05em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .visit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .stats {
+            text-align: center;
+            padding: 20px;
+            color: white;
+            font-size: 0.9em;
+        }
+
+        .emoji {
+            display: inline-block;
+            margin: 0 5px;
+        }
+
+        @media (max-width: 1200px) {
+            .content-area {
+                grid-template-columns: 1fr;
+            }
+            
+            .preview-card {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 40vh;
+            }
+            
+            .top-bar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .actions {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .action-btn {
+                flex: 1;
+            }
+            
+            .content-area {
+                padding: 20px;
+            }
+            
+            .site-name {
+                font-size: 1.6em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>✨ My Interests</h2>
+            </div>
+            <div class="categories" id="categories"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="header">
+                    <span class="sparkle">✨</span>
+                    <h1>Stumble Discovery</h1>
+                </div>
+                
+                <div class="actions">
+                    <button class="action-btn dislike-btn" id="dislikeBtn">
+                        <span>👎</span> Not Interested
+                    </button>
+                    
+                    <button class="action-btn stumble-btn" id="stumbleBtn">
+                        <span>🔀</span> Stumble!
+                    </button>
+
+                    <button class="action-btn like-btn" id="likeBtn">
+                        <span>👍</span> Like It
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Site Display Card -->
+                <div class="card">
+                    <div class="site-display" id="siteDisplay">
+                        <div class="site-icon">🌍</div>
+                        <div class="site-name" id="siteName">Ready to explore?</div>
+                        <div class="site-description" id="siteDescription">Select your interests and click Stumble!</div>
+                        <a href="#" id="visitLink" class="visit-btn" style="display: none;" target="_blank">Visit Site →</a>
+                    </div>
+                </div>
+
+                <!-- Preview Window -->
+                <div class="preview-card">
+                    <div class="preview-title">Site Preview</div>
+                    <div class="preview-frame" id="previewFrame">
+                        <div class="preview-placeholder">
+                            Click "Stumble!" to preview a site
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats">
+                <p>Sites discovered: <span id="siteCount">0</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const websites = {
+            art: [
+                { name: 'The Pudding', url: 'https://pudding.cool', description: 'Visual essays on culture' },
+                { name: 'Colossal', url: 'https://www.thisiscolossal.com', description: 'Art, design, and visual culture' },
+                { name: 'Creative Boom', url: 'https://www.creativeboom.com', description: 'Creative inspiration and news' },
+                { name: 'Behance', url: 'https://www.behance.net', description: 'Showcase of creative work' },
+                { name: 'Dribbble', url: 'https://dribbble.com', description: 'Design inspiration community' },
+                { name: 'Designspiration', url: 'https://www.designspiration.com', description: 'Design inspiration gallery' },
+            ],
+            tech: [
+                { name: 'Hacker News', url: 'https://news.ycombinator.com', description: 'Tech news and discussion' },
+                { name: 'The Verge', url: 'https://www.theverge.com', description: 'Technology and culture' },
+                { name: 'Ars Technica', url: 'https://arstechnica.com', description: 'Technology news and analysis' },
+                { name: 'Product Hunt', url: 'https://www.producthunt.com', description: 'Discover new products' },
+                { name: 'TechCrunch', url: 'https://techcrunch.com', description: 'Startup and tech news' },
+                { name: 'Wired', url: 'https://www.wired.com', description: 'Technology and innovation' },
+            ],
+            entertainment: [
+                { name: 'Atlas Obscura', url: 'https://www.atlasobscura.com', description: 'Unusual travel destinations' },
+                { name: 'The Marginalian', url: 'https://www.themarginalian.org', description: 'Literature, art, and science' },
+                { name: 'Wait But Why', url: 'https://waitbutwhy.com', description: 'Long-form illustrated essays' },
+                { name: 'Bored Panda', url: 'https://www.boredpanda.com', description: 'Interesting stories and art' },
+                { name: 'Laughing Squid', url: 'https://laughingsquid.com', description: 'Art, culture, and tech' },
+                { name: 'Mental Floss', url: 'https://www.mentalfloss.com', description: 'Fascinating facts and trivia' },
+            ],
+            music: [
+                { name: 'Pitchfork', url: 'https://pitchfork.com', description: 'Music reviews and news' },
+                { name: 'Bandcamp', url: 'https://bandcamp.com', description: 'Discover independent music' },
+                { name: 'Song Exploder', url: 'https://songexploder.net', description: 'Stories behind songs' },
+                { name: 'NPR Music', url: 'https://www.npr.org/music', description: 'Music discovery and coverage' },
+                { name: 'Stereogum', url: 'https://www.stereogum.com', description: 'Music news and culture' },
+                { name: 'Consequence', url: 'https://consequence.net', description: 'Music and entertainment news' },
+            ],
+            gaming: [
+                { name: 'Polygon', url: 'https://www.polygon.com', description: 'Gaming news and culture' },
+                { name: 'Rock Paper Shotgun', url: 'https://www.rockpapershotgun.com', description: 'PC gaming coverage' },
+                { name: 'Itch.io', url: 'https://itch.io', description: 'Independent games' },
+                { name: 'Giant Bomb', url: 'https://www.giantbomb.com', description: 'Gaming content and reviews' },
+                { name: 'IGN', url: 'https://www.ign.com', description: 'Video game reviews and news' },
+                { name: 'Kotaku', url: 'https://kotaku.com', description: 'Gaming news and culture' },
+            ],
+            literature: [
+                { name: 'The Paris Review', url: 'https://www.theparisreview.org', description: 'Literary magazine' },
+                { name: 'Electric Literature', url: 'https://electricliterature.com', description: 'Contemporary literature' },
+                { name: 'LitHub', url: 'https://lithub.com', description: 'Literary news and culture' },
+                { name: 'Project Gutenberg', url: 'https://www.gutenberg.org', description: 'Free ebooks' },
+                { name: 'Poetry Foundation', url: 'https://www.poetryfoundation.org', description: 'Poetry and resources' },
+                { name: 'The Rumpus', url: 'https://therumpus.net', description: 'Culture and literature' },
+            ],
+            lifestyle: [
+                { name: 'Wirecutter', url: 'https://www.nytimes.com/wirecutter', description: 'Product recommendations' },
+                { name: 'Cup of Jo', url: 'https://cupofjo.com', description: 'Lifestyle and design' },
+                { name: 'Cool Hunting', url: 'https://coolhunting.com', description: 'Design and culture' },
+                { name: 'Apartment Therapy', url: 'https://www.apartmenttherapy.com', description: 'Home and lifestyle' },
+                { name: 'Bon Appétit', url: 'https://www.bonappetit.com', description: 'Food and recipes' },
+                { name: 'Refinery29', url: 'https://www.refinery29.com', description: 'Fashion and lifestyle' },
+            ],
+            science: [
+                { name: 'Quanta Magazine', url: 'https://www.quantamagazine.org', description: 'Science and math news' },
+                { name: 'Scientific American', url: 'https://www.scientificamerican.com', description: 'Science journalism' },
+                { name: 'Nautilus', url: 'https://nautil.us', description: 'Science, culture, and philosophy' },
+                { name: 'Aeon', url: 'https://aeon.co', description: 'Essays on science and philosophy' },
+                { name: 'Popular Mechanics', url: 'https://www.popularmechanics.com', description: 'Science and technology' },
+                { name: 'New Scientist', url: 'https://www.newscientist.com', description: 'Science news and features' },
+            ],
+            news: [
+                { name: 'Reuters', url: 'https://www.reuters.com', description: 'Global news coverage' },
+                { name: 'BBC News', url: 'https://www.bbc.com/news', description: 'International news' },
+                { name: 'The Guardian', url: 'https://www.theguardian.com', description: 'News and opinion' },
+                { name: 'NPR', url: 'https://www.npr.org', description: 'News and storytelling' },
+                { name: 'Axios', url: 'https://www.axios.com', description: 'Smart, concise news' },
+                { name: 'ProPublica', url: 'https://www.propublica.org', description: 'Investigative journalism' },
+            ],
+            history: [
+                { name: 'History Extra', url: 'https://www.historyextra.com', description: 'Historical articles and podcasts' },
+                { name: 'Smithsonian Magazine', url: 'https://www.smithsonianmag.com', description: 'History, science, and culture' },
+                { name: 'Ancient Origins', url: 'https://www.ancient-origins.net', description: 'Ancient history and archaeology' },
+                { name: 'The History Blog', url: 'http://www.thehistoryblog.com', description: 'Daily historical discoveries' },
+                { name: 'History Today', url: 'https://www.historytoday.com', description: 'World history magazine' },
+            ],
+            sports: [
+                { name: 'The Athletic', url: 'https://theathletic.com', description: 'In-depth sports coverage' },
+                { name: 'ESPN', url: 'https://www.espn.com', description: 'Sports news and scores' },
+                { name: 'Bleacher Report', url: 'https://bleacherreport.com', description: 'Sports news and highlights' },
+                { name: 'SB Nation', url: 'https://www.sbnation.com', description: 'Sports news and fan culture' },
+                { name: 'Sports Illustrated', url: 'https://www.si.com', description: 'Sports journalism' },
+            ],
+            photography: [
+                { name: 'PetaPixel', url: 'https://petapixel.com', description: 'Photography news and tutorials' },
+                { name: 'Feature Shoot', url: 'https://www.featureshoot.com', description: 'Contemporary photography' },
+                { name: 'Fstoppers', url: 'https://fstoppers.com', description: 'Photography community' },
+                { name: 'DIY Photography', url: 'https://www.diyphotography.net', description: 'Photo tips and tricks' },
+                { name: 'Digital Photography Review', url: 'https://www.dpreview.com', description: 'Camera reviews and news' },
+            ],
+            space: [
+                { name: 'Space.com', url: 'https://www.space.com', description: 'Space news and exploration' },
+                { name: 'Universe Today', url: 'https://www.universetoday.com', description: 'Astronomy and space science' },
+                { name: 'NASA', url: 'https://www.nasa.gov', description: 'Official NASA website' },
+                { name: 'The Planetary Society', url: 'https://www.planetary.org', description: 'Space exploration advocacy' },
+                { name: 'Sky & Telescope', url: 'https://skyandtelescope.org', description: 'Astronomy magazine' },
+            ],
+            food: [
+                { name: 'Serious Eats', url: 'https://www.seriouseats.com', description: 'Food science and recipes' },
+                { name: 'Food52', url: 'https://food52.com', description: 'Recipe community' },
+                { name: 'Eater', url: 'https://www.eater.com', description: 'Food news and culture' },
+                { name: 'The Kitchn', url: 'https://www.thekitchn.com', description: 'Cooking tips and recipes' },
+                { name: 'Epicurious', url: 'https://www.epicurious.com', description: 'Recipes and cooking guides' },
+            ],
+            nature: [
+                { name: 'Earth Touch News', url: 'https://www.earthtouchnews.com', description: 'Wildlife and nature' },
+                { name: 'National Geographic', url: 'https://www.nationalgeographic.com', description: 'Nature and exploration' },
+                { name: 'The Nature Conservancy', url: 'https://www.nature.org', description: 'Conservation stories' },
+                { name: 'iNaturalist', url: 'https://www.inaturalist.org', description: 'Nature observation community' },
+                { name: 'Earth.com', url: 'https://www.earth.com', description: 'Environmental news' },
+            ],
+            psychology: [
+                { name: 'Psychology Today', url: 'https://www.psychologytoday.com', description: 'Psychology and mental health' },
+                { name: 'The Psychologist', url: 'https://www.bps.org.uk/psychologist', description: 'Psychology magazine' },
+                { name: 'Psych Central', url: 'https://psychcentral.com', description: 'Mental health resources' },
+                { name: 'Mind Hacks', url: 'https://mindhacks.com', description: 'Neuroscience and psychology' },
+                { name: 'BPS Research Digest', url: 'https://digest.bps.org.uk', description: 'Psychology research' },
+            ],
+            diy: [
+                { name: 'Instructables', url: 'https://www.instructables.com', description: 'DIY projects and tutorials' },
+                { name: 'Make Magazine', url: 'https://makezine.com', description: 'Maker projects and tech' },
+                { name: 'Hackaday', url: 'https://hackaday.com', description: 'Hardware hacks and projects' },
+                { name: 'The Art of Manliness', url: 'https://www.artofmanliness.com', description: 'Skills and self-improvement' },
+                { name: 'DIY Network', url: 'https://www.diynetwork.com', description: 'Home improvement projects' },
+            ],
+            movies: [
+                { name: 'IndieWire', url: 'https://www.indiewire.com', description: 'Film news and reviews' },
+                { name: 'The Film Stage', url: 'https://thefilmstage.com', description: 'Film criticism and features' },
+                { name: 'Rotten Tomatoes', url: 'https://www.rottentomatoes.com', description: 'Movie reviews aggregator' },
+                { name: 'Letterboxd', url: 'https://letterboxd.com', description: 'Social film discovery' },
+                { name: 'Criterion Collection', url: 'https://www.criterion.com', description: 'Classic and contemporary films' },
+            ],
+            comics: [
+                { name: 'The Beat', url: 'https://www.comicsbeat.com', description: 'Comics news and culture' },
+                { name: 'Comic Book Resources', url: 'https://www.cbr.com', description: 'Comic news and reviews' },
+                { name: 'AV Club Comics', url: 'https://www.avclub.com/c/comics', description: 'Comics coverage' },
+                { name: 'SMBC Comics', url: 'https://www.smbc-comics.com', description: 'Daily webcomic' },
+                { name: 'Explosm', url: 'https://explosm.net', description: 'Cyanide & Happiness webcomics' },
+            ],
+            fashion: [
+                { name: 'The Cut', url: 'https://www.thecut.com', description: 'Fashion and style' },
+                { name: 'Fashionista', url: 'https://fashionista.com', description: 'Fashion news and trends' },
+                { name: 'Vogue', url: 'https://www.vogue.com', description: 'Fashion magazine' },
+                { name: 'Hypebeast', url: 'https://hypebeast.com', description: 'Fashion and streetwear' },
+                { name: 'Man Repeller', url: 'https://repeller.com', description: 'Fashion and lifestyle' },
+            ],
+            finance: [
+                { name: 'The Motley Fool', url: 'https://www.fool.com', description: 'Investment advice' },
+                { name: 'Investopedia', url: 'https://www.investopedia.com', description: 'Financial education' },
+                { name: 'Mr. Money Mustache', url: 'https://www.mrmoneymustache.com', description: 'Financial independence blog' },
+                { name: 'Financial Times', url: 'https://www.ft.com', description: 'Business and finance news' },
+                { name: 'Bloomberg', url: 'https://www.bloomberg.com', description: 'Business and markets' },
+            ],
+            travel: [
+                { name: 'Lonely Planet', url: 'https://www.lonelyplanet.com', description: 'Travel guides and tips' },
+                { name: 'Nomadic Matt', url: 'https://www.nomadicmatt.com', description: 'Budget travel advice' },
+                { name: 'Roads & Kingdoms', url: 'https://roadsandkingdoms.com', description: 'Travel and food stories' },
+                { name: 'Travel + Leisure', url: 'https://www.travelandleisure.com', description: 'Travel inspiration' },
+                { name: 'The Points Guy', url: 'https://thepointsguy.com', description: 'Travel rewards and tips' },
+            ],
+            cars: [
+                { name: 'Jalopnik', url: 'https://jalopnik.com', description: 'Car news and culture' },
+                { name: 'Car and Driver', url: 'https://www.caranddriver.com', description: 'Automotive reviews' },
+                { name: 'The Drive', url: 'https://www.thedrive.com', description: 'Cars and culture' },
+                { name: 'Top Gear', url: 'https://www.topgear.com', description: 'Car reviews and features' },
+                { name: 'Autoblog', url: 'https://www.autoblog.com', description: 'Automotive news' },
+            ],
+            pets: [
+                { name: 'The Dodo', url: 'https://www.thedodo.com', description: 'Animal stories and videos' },
+                { name: 'Catster', url: 'https://www.catster.com', description: 'Cat care and culture' },
+                { name: 'Dogster', url: 'https://www.dogster.com', description: 'Dog care and culture' },
+                { name: 'The Spruce Pets', url: 'https://www.thesprucepets.com', description: 'Pet care advice' },
+                { name: 'Modern Dog Magazine', url: 'https://moderndogmagazine.com', description: 'Dog lifestyle magazine' },
+            ],
+            fitness: [
+                { name: 'Precision Nutrition', url: 'https://www.precisionnutrition.com', description: 'Nutrition and fitness' },
+                { name: 'Breaking Muscle', url: 'https://breakingmuscle.com', description: 'Fitness and nutrition' },
+                { name: 'Runner\'s World', url: 'https://www.runnersworld.com', description: 'Running news and training' },
+                { name: 'Outside Online', url: 'https://www.outsideonline.com', description: 'Outdoor fitness and adventure' },
+                { name: 'Men\'s Health', url: 'https://www.menshealth.com', description: 'Fitness and wellness' },
+            ],
+            education: [
+                { name: 'Khan Academy', url: 'https://www.khanacademy.org', description: 'Free online learning' },
+                { name: 'Coursera', url: 'https://www.coursera.org', description: 'Online courses' },
+                { name: 'TED-Ed', url: 'https://ed.ted.com', description: 'Educational videos' },
+                { name: 'Open Culture', url: 'https://www.openculture.com', description: 'Free cultural resources' },
+                { name: 'EdSurge', url: 'https://www.edsurge.com', description: 'Education technology news' },
+            ],
+            weird: [
+                { name: 'Weird Universe', url: 'https://www.weeirduniverse.net', description: 'Strange and unusual stories' },
+                { name: 'Museum of Ridiculously Interesting Things', url: 'https://ridiculouslyinteresting.com', description: 'Quirky curiosities' },
+                { name: 'The Toast', url: 'https://the-toast.net', description: 'Humor and culture archive' },
+                { name: 'Cracked', url: 'https://www.cracked.com', description: 'Humor and weird facts' },
+                { name: 'The Awesomer', url: 'https://theawesomer.com', description: 'Cool and unusual finds' },
+            ],
+            philosophy: [
+                { name: 'Philosophy Now', url: 'https://philosophynow.org', description: 'Philosophy magazine' },
+                { name: '3:16', url: 'https://316am.site123.me', description: 'Philosophy interviews' },
+                { name: 'Stanford Encyclopedia of Philosophy', url: 'https://plato.stanford.edu', description: 'Philosophy reference' },
+                { name: 'Daily Nous', url: 'https://dailynous.com', description: 'Philosophy news and discussion' },
+                { name: 'The Partially Examined Life', url: 'https://partiallyexaminedlife.com', description: 'Philosophy podcast and blog' },
+            ],
+        };
+
+        const categories = [
+            { id: 'all', name: 'All', emoji: '🌍' },
+            { id: 'art', name: 'Art & Design', emoji: '🎨' },
+            { id: 'tech', name: 'Technology', emoji: '💻' },
+            { id: 'entertainment', name: 'Entertainment', emoji: '🎬' },
+            { id: 'music', name: 'Music', emoji: '🎵' },
+            { id: 'gaming', name: 'Gaming', emoji: '🎮' },
+            { id: 'literature', name: 'Literature', emoji: '📚' },
+            { id: 'lifestyle', name: 'Lifestyle', emoji: '☕' },
+            { id: 'science', name: 'Science', emoji: '🔬' },
+            { id: 'news', name: 'News', emoji: '📰' },
+            { id: 'history', name: 'History', emoji: '🏛️' },
+            { id: 'sports', name: 'Sports', emoji: '⚽' },
+            { id: 'photography', name: 'Photography', emoji: '📷' },
+            { id: 'space', name: 'Space', emoji: '🚀' },
+            { id: 'food', name: 'Food & Cooking', emoji: '🍳' },
+            { id: 'nature', name: 'Nature & Wildlife', emoji: '🦋' },
+            { id: 'psychology', name: 'Psychology', emoji: '🧠' },
+            { id: 'diy', name: 'DIY & Making', emoji: '🔨' },
+            { id: 'movies', name: 'Movies & Film', emoji: '🎥' },
+            { id: 'comics', name: 'Comics & Webcomics', emoji: '💭' },
+            { id: 'fashion', name: 'Fashion & Style', emoji: '👗' },
+            { id: 'finance', name: 'Finance & Money', emoji: '💰' },
+            { id: 'travel', name: 'Travel', emoji: '✈️' },
+            { id: 'cars', name: 'Cars & Automotive', emoji: '🚗' },
+            { id: 'pets', name: 'Pets & Animals', emoji: '🐾' },
+            { id: 'fitness', name: 'Fitness & Health', emoji: '💪' },
+            { id: 'education', name: 'Education & Learning', emoji: '🎓' },
+            { id: 'weird', name: 'Weird & Unusual', emoji: '👽' },
+            { id: 'philosophy', name: 'Philosophy', emoji: '🤔' },
+        ];
+
+        let selectedCategories = ['all'];
+        let history = [];
+        let currentSite = null;
+
+        // Initialize categories
+        const categoriesContainer = document.getElementById('categories');
+        categories.forEach(cat => {
+            const btn = document.createElement('button');
+            btn.className = 'category-btn';
+            if (cat.id === 'all') btn.classList.add('active');
+            btn.innerHTML = `<span class="emoji">${cat.emoji}</span> ${cat.name}`;
+            btn.onclick = () => toggleCategory(cat.id);
+            btn.dataset.categoryId = cat.id;
+            categoriesContainer.appendChild(btn);
+        });
+
+        function toggleCategory(categoryId) {
+            if (categoryId === 'all') {
+                selectedCategories = ['all'];
+            } else {
+                selectedCategories = selectedCategories.filter(c => c !== 'all');
+                const index = selectedCategories.indexOf(categoryId);
+                if (index > -1) {
+                    selectedCategories.splice(index, 1);
+                } else {
+                    selectedCategories.push(categoryId);
+                }
+                if (selectedCategories.length === 0) {
+                    selectedCategories = ['all'];
+                }
+            }
+            updateCategoryButtons();
+        }
+
+        function updateCategoryButtons() {
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                const catId = btn.dataset.categoryId;
+                if (selectedCategories.includes(catId)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        function getRandomSite() {
+            const availableCategories = selectedCategories.includes('all') 
+                ? Object.keys(websites) 
+                : selectedCategories;
+            
+            const allSites = availableCategories.flatMap(cat => websites[cat] || []);
+            
+            if (allSites.length === 0) return null;
+            
+            const recentHistory = history.slice(-5);
+            const filteredSites = allSites.filter(site => 
+                !recentHistory.some(h => h.url === site.url)
+            );
+            
+            const sitesToChooseFrom = filteredSites.length > 0 ? filteredSites : allSites;
+            return sitesToChooseFrom[Math.floor(Math.random() * sitesToChooseFrom.length)];
+        }
+
+        function stumble() {
+            const siteDisplay = document.getElementById('siteDisplay');
+            const stumbleBtn = document.getElementById('stumbleBtn');
+            const previewFrame = document.getElementById('previewFrame');
+            
+            stumbleBtn.disabled = true;
+            siteDisplay.classList.add('fade');
+            
+            setTimeout(() => {
+                currentSite = getRandomSite();
+                if (currentSite) {
+                    document.getElementById('siteName').textContent = currentSite.name;
+                    document.getElementById('siteDescription').textContent = currentSite.description;
+                    const visitLink = document.getElementById('visitLink');
+                    visitLink.href = currentSite.url;
+                    visitLink.style.display = 'inline-block';
+                    
+                    // Update preview with screenshot
+                    // Using a free screenshot API service
+                    const screenshotUrl = `https://api.screenshotmachine.com/?key=demo&url=${encodeURIComponent(currentSite.url)}&dimension=1024x768`;
+                    previewFrame.innerHTML = `<img class="preview-iframe" src="${screenshotUrl}" alt="Site preview" onerror="this.parentElement.innerHTML='<div class=\\'preview-placeholder\\'>Preview not available</div>'">`;
+                    
+                    history.push(currentSite);
+                    if (history.length > 20) history.shift();
+                    document.getElementById('siteCount').textContent = history.length;
+                }
+                
+                siteDisplay.classList.remove('fade');
+                stumbleBtn.disabled = false;
+            }, 300);
+        }
+
+        function rateSite(isLiked) {
+            setTimeout(stumble, 500);
+        }
+
+        // Event listeners
+        document.getElementById('stumbleBtn').addEventListener('click', stumble);
+        document.getElementById('likeBtn').addEventListener('click', () => rateSite(true));
+        document.getElementById('dislikeBtn').addEventListener('click', () => rateSite(false));
+
+        // Start with first site
+        stumble();
+    </script>
+</body>
+</html>

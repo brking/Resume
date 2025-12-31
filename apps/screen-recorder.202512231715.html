@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screen Recorder Pro</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+        :root {
+            --primary: #00ff88;
+            --secondary: #ff0080;
+            --accent: #00d4ff;
+            --dark: #0a0e1a;
+            --darker: #050810;
+            --glow: rgba(0, 255, 136, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--darker);
+            color: var(--primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(255, 0, 128, 0.1) 0%, transparent 50%);
+            animation: pulseGlow 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background: rgba(10, 14, 26, 0.8);
+            border: 2px solid var(--primary);
+            border-radius: 20px;
+            padding: 60px 40px;
+            box-shadow: 
+                0 0 40px var(--glow),
+                inset 0 0 40px rgba(0, 255, 136, 0.05);
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 1;
+            animation: slideIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent);
+        }
+
+        .corner.top-left {
+            top: -2px;
+            left: -2px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .corner.top-right {
+            top: -2px;
+            right: -2px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .corner.bottom-left {
+            bottom: -2px;
+            left: -2px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .corner.bottom-right {
+            bottom: -2px;
+            right: -2px;
+            border-left: none;
+            border-top: none;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, var(--primary), var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleShimmer 3s ease-in-out infinite;
+            text-shadow: 0 0 30px var(--glow);
+        }
+
+        @keyframes titleShimmer {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+        }
+
+        .status {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 0.9rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .status-dot.recording {
+            background: var(--secondary);
+            box-shadow: 0 0 20px var(--secondary);
+            animation: recordingPulse 0.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        @keyframes recordingPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.3); }
+        }
+
+        .timer {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 600;
+            margin: 30px 0;
+            color: var(--primary);
+            text-shadow: 0 0 20px var(--glow);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 3px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            font-family: 'Orbitron', sans-serif;
+            padding: 18px 36px;
+            font-size: 1rem;
+            font-weight: 700;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: var(--primary);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+            z-index: -1;
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button:hover {
+            color: var(--dark);
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--glow);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: #333;
+            color: #333;
+        }
+
+        button:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        #recordBtn.recording {
+            border-color: var(--secondary);
+            color: var(--secondary);
+            animation: recordingGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes recordingGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 0, 128, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(255, 0, 128, 0.8); }
+        }
+
+        #downloadBtn {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        #downloadBtn::before {
+            background: var(--accent);
+        }
+
+        .preview {
+            margin-top: 40px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .preview.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .preview video {
+            max-width: 100%;
+            border: 2px solid var(--accent);
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+            background: var(--dark);
+        }
+
+        .info {
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(0, 255, 136, 0.05);
+            border-left: 4px solid var(--primary);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            border-radius: 4px;
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(to bottom, transparent, var(--primary), transparent);
+            animation: scan 3s linear infinite;
+            pointer-events: none;
+            opacity: 0.1;
+            z-index: 999;
+        }
+
+        @keyframes scan {
+            from { transform: translateY(0); }
+            to { transform: translateY(100vh); }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanline"></div>
+    
+    <div class="container">
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+        
+        <h1>Screen Recorder</h1>
+        
+        <div class="status">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="statusText">Ready to Record</span>
+        </div>
+        
+        <div class="timer" id="timer">00:00:00</div>
+        
+        <div class="controls">
+            <button id="recordBtn">Start Recording</button>
+            <button id="stopBtn" disabled>Stop</button>
+            <button id="downloadBtn" disabled>Download</button>
+        </div>
+        
+        <div class="preview" id="preview">
+            <video id="videoPreview" controls></video>
+        </div>
+        
+        <div class="info">
+            <strong>Instructions:</strong> Click "Start Recording" to capture your screen with audio. You'll be prompted to select which screen/window to share. The recording includes both video and system audio without requiring any environment changes.
+        </div>
+    </div>
+
+    <script>
+        let mediaRecorder;
+        let recordedChunks = [];
+        let stream;
+        let timerInterval;
+        let seconds = 0;
+
+        const recordBtn = document.getElementById('recordBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const statusText = document.getElementById('statusText');
+        const statusDot = document.getElementById('statusDot');
+        const timer = document.getElementById('timer');
+        const preview = document.getElementById('preview');
+        const videoPreview = document.getElementById('videoPreview');
+
+        function formatTime(totalSeconds) {
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const secs = totalSeconds % 60;
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function startTimer() {
+            seconds = 0;
+            timer.textContent = formatTime(seconds);
+            timerInterval = setInterval(() => {
+                seconds++;
+                timer.textContent = formatTime(seconds);
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        recordBtn.addEventListener('click', async () => {
+            try {
+                // Request screen capture with audio
+                stream = await navigator.mediaDevices.getDisplayMedia({
+                    video: {
+                        mediaSource: 'screen',
+                        cursor: 'always'
+                    },
+                    audio: {
+                        echoCancellation: false,
+                        noiseSuppression: false,
+                        sampleRate: 44100
+                    }
+                });
+
+                // Set up MediaRecorder
+                const options = {
+                    mimeType: 'video/webm;codecs=vp8,opus',
+                    videoBitsPerSecond: 2500000
+                };
+
+                mediaRecorder = new MediaRecorder(stream, options);
+                recordedChunks = [];
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                    const url = URL.createObjectURL(blob);
+                    videoPreview.src = url;
+                    preview.classList.add('visible');
+                    downloadBtn.disabled = false;
+                    
+                    downloadBtn.onclick = () => {
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `screen-recording-${Date.now()}.webm`;
+                        a.click();
+                    };
+                };
+
+                // Start recording
+                mediaRecorder.start();
+                startTimer();
+
+                // Update UI
+                recordBtn.disabled = true;
+                recordBtn.classList.add('recording');
+                stopBtn.disabled = false;
+                downloadBtn.disabled = true;
+                statusText.textContent = 'Recording in Progress';
+                statusDot.classList.add('recording');
+                preview.classList.remove('visible');
+
+                // Handle when user stops sharing via browser UI
+                stream.getVideoTracks()[0].onended = () => {
+                    if (mediaRecorder.state === 'recording') {
+                        stopRecording();
+                    }
+                };
+
+            } catch (err) {
+                console.error('Error starting recording:', err);
+                alert('Failed to start recording. Make sure you granted screen capture permissions.');
+            }
+        });
+
+        stopBtn.addEventListener('click', stopRecording);
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                stopTimer();
+                
+                // Stop all tracks
+                stream.getTracks().forEach(track => track.stop());
+                
+                // Update UI
+                recordBtn.disabled = false;
+                recordBtn.classList.remove('recording');
+                stopBtn.disabled = true;
+                statusText.textContent = 'Recording Complete';
+                statusDot.classList.remove('recording');
+            }
+        }
+    </script>
+</body>
+</html>
