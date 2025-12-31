@@ -6,10 +6,23 @@ echo ========================================
 echo.
 
 REM Commit to Git with optional message
+REM if "%~1"=="" (
+REM     git add .
+REM     git commit -m "Update: %date% %time%"
+REM     git push
+REM ) else (
+REM     git add .
+REM     git commit -m "Update: %date% %time% - %~1"
+REM     git push
+REM )
+
+REM Check if parameter was provided
 if "%~1"=="" (
-    git add .
-    git commit -m "Update: %date% %time%"
-    git push
+    echo ERROR: Please provide a commit message
+    echo Usage: update.bat "your message here"
+    echo.
+    pause
+    exit /b 1
 ) else (
     git add .
     git commit -m "Update: %date% %time% - %~1"
